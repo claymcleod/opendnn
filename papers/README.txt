@@ -19,3 +19,5 @@ PAPERS.txt
 
 [T1] Convolutional training stages => (http://arxiv.org/abs/1409.1556)
 [T2] Thin deep net training stages => (http://arxiv.org/abs/1412.6550)
+[T3] Loss functions at different training stages => (http://arxiv.org/abs/1409.4842)
+[T4] Deeply supervised nets training stages => (http://jmlr.org/proceedings/papers/v38/lee15a.html)
