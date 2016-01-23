@@ -2,9 +2,6 @@ import numpy
 import theano
 import theano.tensor
 
-numpy.random.seed(1337)
-
-
 class Layer(object):
 
     def __init__(self, output_dim=None, name=''):
