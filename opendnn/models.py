@@ -2,6 +2,7 @@ import theano
 import theano.tensor
 import theano.d3viz as V
 
+
 class NeuralNetwork(object):
 
     def __init__(self, input_dim):
@@ -31,10 +32,11 @@ class NeuralNetwork(object):
 
         for index, (layer, (input_dim, output_dim)) in enumerate(
                 zip(self.layers, self.dims)):
-            if y_hat == None:
+            if y_hat is None:
                 y_hat = layer._build_layer_(X, input_dim, output_dim, index)
             else:
-                y_hat = layer._build_layer_(y_hat, input_dim, output_dim, index)
+                y_hat = layer._build_layer_(
+                    y_hat, input_dim, output_dim, index)
 
         _loss_fn = loss_fn(y_hat, y)
         _pred_fn = pred_fn(y_hat)

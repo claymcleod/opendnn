@@ -19,6 +19,7 @@ class Layer(object):
         raise NotImplementedError(
             "You must implement _get_updates_()!")
 
+
 class Dense(Layer):
 
     def __init__(self, *args, **kwargs):
@@ -26,16 +27,29 @@ class Dense(Layer):
 
     def _build_layer_(self, X, input_dim, output_dim, layer_num):
         self.W = theano.shared(numpy.random.randn(input_dim, output_dim),
-                          name='Layer{}_W'.format(layer_num))
+                               name='Layer{}_W'.format(layer_num))
         self.B = theano.shared(numpy.zeros(output_dim),
-                          name='Layer{}_B'.format(layer_num))
+                               name='Layer{}_B'.format(layer_num))
         return X.dot(self.W) + self.B
 
     def _get_updates_(self, loss, learning_rate):
         updates = []
-        updates.append((self.W, self.W - theano.tensor.grad(loss, self.W) * learning_rate))
-        updates.append((self.B, self.B - theano.tensor.grad(loss, self.B) * learning_rate))
+        updates.append(
+            (self.W,
+             self.W -
+             theano.tensor.grad(
+                 loss,
+                 self.W) *
+                learning_rate))
+        updates.append(
+            (self.B,
+             self.B -
+             theano.tensor.grad(
+                 loss,
+                 self.B) *
+                learning_rate))
         return updates
+
 
 class Activation(Layer):
 
