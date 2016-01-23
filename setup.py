@@ -9,4 +9,4 @@ setup(name='OpenDNN',
       license='MIT',
       install_requires=['theano'],
       packages=find_packages()
-)
+      )
