@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name='OpenDNN',
+setup(name='opendnn',
       version='1.0.0',
       description='Open deep neural network framework',
       author='Clay McLeod',
