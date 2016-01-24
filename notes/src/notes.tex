@@ -1,0 +1,44 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+
+\title{Notes on Deep Neural Networks}
+\author{Clay L. McLeod --- \texttt{clay.l.mcleod@gmail.com}}
+
+\begin{document}
+\maketitle
+
+\section{Neural Network Basics}
+\subsection{Weight Initializations}
+
+\subsubsection{Lecun's Distribution}
+
+Presented in \cite[Sec 4.6]{efficient-backprop}.
+
+\begin{equation}
+    X \sim U \left[~-\frac{1}{\sqrt{n_{j}}},~\frac{1}{\sqrt{n_{j}}}~\right]
+    \label{eq:lecun}
+\end{equation}
+
+
+\subsubsection{Glorot Distribution}
+
+Presented in \cite[4.2]{glorot10}.
+
+\begin{equation}
+    X \sim U \left[~-\frac{\sqrt{6}}{\sqrt{n_{j} + n_{j+1}}},~\frac{\sqrt{6}}{\sqrt{n_{j} + n_{j+1}}}~\right]
+    \label{eq:glorot}
+\end{equation}
+
+\subsubsection{He Distribution}
+
+Presented in \cite[pg. 4]{he15}.
+
+\begin{equation}
+    X \sim U \left[~-\sqrt{\frac{2}{n_{j}}},~\sqrt{\frac{2}{n_{j}}}~\right]
+    \label{eq:he}
+\end{equation}
+
+\bibliographystyle{ieeetr}
+\bibliography{notes}
+\end{document}

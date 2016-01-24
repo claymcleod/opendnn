@@ -11,6 +11,7 @@ PAPERS.txt
 [I1] Glorot initializations => (http://jmlr.org/proceedings/papers/v9/glorot10a/glorot10a.pdf)
 [I2] He initializations => (http://arxiv.org/abs/1502.01852)
 [I3] Saxe orthogonal initializations => (http://arxiv.org/abs/1312.6120)
+[I4] Lecun's Uniform Distribution => (http://cseweb.ucsd.edu/classes/wi08/cse253/Handouts/lecun-98b.pdf)
 
 
 #######################
