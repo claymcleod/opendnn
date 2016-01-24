@@ -8,7 +8,7 @@ class Layer(object):
         self.output_dim = output_dim
         self.name = name
 
-    def _build_layer_(self, X, input_dim, output_dim, layer_num):
+    def _build_layer_(self, X, layer_num, input_dim, output_dim, init_fn, use_normal):
         raise NotImplementedError(
             "You must implement _build_layer_()!")
 
@@ -22,8 +22,8 @@ class Dense(Layer):
     def __init__(self, *args, **kwargs):
         super(Dense, self).__init__(*args, **kwargs)
 
-    def _build_layer_(self, X, input_dim, output_dim, layer_num):
-        self.W = theano.shared(numpy.random.randn(input_dim, output_dim),
+    def _build_layer_(self, X, layer_num, input_dim, output_dim, init_fn, use_normal):
+        self.W = theano.shared(init_fn(input_dim, output_dim, use_normal),
                                name='Layer{}_W'.format(layer_num))
         self.B = theano.shared(numpy.zeros(output_dim),
                                name='Layer{}_B'.format(layer_num))
@@ -65,7 +65,7 @@ class Activation(Layer):
                 "Unsupported activation type: {}".format(activation))
         super(Activation, self).__init__(*args, **kwargs)
 
-    def _build_layer_(self, X, input_dim, output_dim, layer_num):
+    def _build_layer_(self, X, layer_num, input_dim, output_dim, init_fn, use_normal):
         return self.nonlinearity(X)
 
     def _get_updates_(self, loss, learning_rate):

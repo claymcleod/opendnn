@@ -12,9 +12,9 @@ class NeuralNetwork(object):
     def add_layer(self, layer):
         self.layers.append(layer)
 
-    def compile(self, loss_fn, pred_fn, learning_rate=0.1):
+    def compile(self, loss_fn, pred_fn, init_fn, learning_rate=0.1, use_normal=False):
         self._compile_dims_()
-        self._compile_theano_(loss_fn, pred_fn, learning_rate)
+        self._compile_theano_(loss_fn, pred_fn, init_fn, learning_rate, use_normal)
 
     def _compile_dims_(self):
         self.dims = [self.input_dim]
@@ -25,7 +25,7 @@ class NeuralNetwork(object):
                 self.dims[i] = self.dims[i - 1]
         self.dims = zip(self.dims, self.dims[1:])
 
-    def _compile_theano_(self, loss_fn, pred_fn, learning_rate):
+    def _compile_theano_(self, loss_fn, pred_fn, init_fn, learning_rate, use_normal):
         X = theano.tensor.matrix('X', theano.config.floatX)
         y = theano.tensor.matrix('y', theano.config.floatX)
         y_hat = None
@@ -33,10 +33,9 @@ class NeuralNetwork(object):
         for index, (layer, (input_dim, output_dim)) in enumerate(
                 zip(self.layers, self.dims)):
             if y_hat is None:
-                y_hat = layer._build_layer_(X, input_dim, output_dim, index)
+                y_hat = layer._build_layer_(X, index, input_dim, output_dim, init_fn, use_normal)
             else:
-                y_hat = layer._build_layer_(
-                    y_hat, input_dim, output_dim, index)
+                y_hat = layer._build_layer_(y_hat, index, input_dim, output_dim, init_fn, use_normal)
 
         _loss_fn = loss_fn(y_hat, y)
         _pred_fn = pred_fn(y_hat)

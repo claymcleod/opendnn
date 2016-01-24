@@ -16,18 +16,28 @@
 Presented in \cite[Sec 4.6]{efficient-backprop}.
 
 \begin{equation}
-    X \sim U \left[~-\frac{1}{\sqrt{n_{j}}},~\frac{1}{\sqrt{n_{j}}}~\right]
-    \label{eq:lecun}
+    X \sim N \left[~-\frac{1}{\sqrt{n_{j}}},~\frac{1}{\sqrt{n_{j}}}~\right]\\
+    \label{eq:lecun:normal}
 \end{equation}
 
+
+\begin{equation}
+    X \sim U \left[~-\frac{3}{\sqrt{n_{j}}},~\frac{3}{\sqrt{n_{j}}}~\right]
+    \label{eq:lecun:uniform}
+\end{equation}
 
 \subsubsection{Glorot Distribution}
 
 Presented in \cite[4.2]{glorot10}.
 
 \begin{equation}
+    X \sim N \left[~-\frac{\sqrt{2}}{\sqrt{n_{j} + n_{j+1}}},~\frac{\sqrt{2}}{\sqrt{n_{j} + n_{j+1}}}~\right]\\
+    \label{eq:glorot:normal}
+\end{equation}
+
+\begin{equation}
     X \sim U \left[~-\frac{\sqrt{6}}{\sqrt{n_{j} + n_{j+1}}},~\frac{\sqrt{6}}{\sqrt{n_{j} + n_{j+1}}}~\right]
-    \label{eq:glorot}
+    \label{eq:glorot:uniform}
 \end{equation}
 
 \subsubsection{He Distribution}
@@ -35,8 +45,13 @@ Presented in \cite[4.2]{glorot10}.
 Presented in \cite[pg. 4]{he15}.
 
 \begin{equation}
-    X \sim U \left[~-\sqrt{\frac{2}{n_{j}}},~\sqrt{\frac{2}{n_{j}}}~\right]
-    \label{eq:he}
+    X \sim N \left[~-\sqrt{\frac{2}{n_{j}}},~\sqrt{\frac{2}{n_{j}}}~\right]\\
+    \label{eq:he:normal}
+\end{equation}
+
+\begin{equation}
+    X \sim U \left[~-\sqrt{\frac{6}{n_{j}}},~\sqrt{\frac{6}{n_{j}}}~\right]
+    \label{eq:he:uniform}
 \end{equation}
 
 \bibliographystyle{ieeetr}
