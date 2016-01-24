@@ -1,5 +1,11 @@
 import numpy
 
+def resolve(init_fn):
+    if not init_fn in globals():
+        raise NameError("Unknown init function: {}".format(init_fn))
+
+    return globals().get(init_fn)
+
 def uniform(size, rng):
     return numpy.random.uniform(low=-rng, high=rng, size=size)
 

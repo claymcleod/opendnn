@@ -1,7 +1,9 @@
 import theano
 import theano.tensor
 import theano.d3viz as V
-
+import opendnn.loss
+import opendnn.initialization
+import opendnn.pred
 
 class NeuralNetwork(object):
 
@@ -12,7 +14,7 @@ class NeuralNetwork(object):
     def add_layer(self, layer):
         self.layers.append(layer)
 
-    def compile(self, loss_fn, pred_fn, init_fn, learning_rate=0.1, use_normal=False):
+    def compile(self, loss_fn, pred_fn, init_fn='lecun', learning_rate=0.1, use_normal=False):
         self._compile_dims_()
         self._compile_theano_(loss_fn, pred_fn, init_fn, learning_rate, use_normal)
 
@@ -29,6 +31,15 @@ class NeuralNetwork(object):
         X = theano.tensor.matrix('X', theano.config.floatX)
         y = theano.tensor.matrix('y', theano.config.floatX)
         y_hat = None
+
+        if type(loss_fn) == str:
+            loss_fn = opendnn.loss.resolve(loss_fn)
+
+        if type(pred_fn) == str:
+            pred_fn = opendnn.pred.resolve(pred_fn)
+
+        if type(init_fn) == str:
+            init_fn = opendnn.initialization.resolve(init_fn)
 
         for index, (layer, (input_dim, output_dim)) in enumerate(
                 zip(self.layers, self.dims)):
@@ -51,10 +62,33 @@ class NeuralNetwork(object):
         self.train_fn = theano.function([X, y], updates=updates)
         return
 
-    def train(self, X_train, y_train):
+    def train(self, X, y):
         assert hasattr(self, 'train_fn'), (
             "You must first compile the network!")
-        self.train_fn(X_train, y_train)
+        self.train_fn(X, y)
+
+    def train_until_convergence(self, X, y, max_iterations=None, step=100, threshold=1e-3,
+                               verbose=False):
+        i = 0
+        last_loss = 0
+
+        while max_iterations is None or i < max_iterations:
+            for x in range(step+1):
+                self.train(X, y)
+
+            this_loss = self.get_loss(X, y)
+
+            if verbose:
+                print("Iteration {} - Loss: {}".format(i, this_loss))
+
+            if (abs(last_loss - this_loss) <= threshold):
+                break
+
+            last_loss = this_loss
+            i = i + step
+
+        if verbose:
+            print("Converged at iteration {}".format(i))
 
     def get_loss(self, X, y):
         return self.loss_fn(X, y)
