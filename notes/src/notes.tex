@@ -13,7 +13,8 @@
 
 \subsubsection{Lecun's Distribution}
 
-Presented in \cite[Sec 4.6]{efficient-backprop}.
+Presented in \cite[Sec 4.6]{efficient-backprop}, Lecun's distribution assumes a linear model and is based on the following argument: suppose we have a neural network activation layer that uses $tanh(X)$ as a nonlinear squashing function. In order for convergence to occur quickly, the weights should be initialized so that (1) the weights are not too small, causing the gradient function to be small and (2) the $tanh$ is not saturated (the weights are not too large), also causing
+the gradient function to be small. Assuming that the data is properly normalized, all we need to do is initialize the weights to have $\mu=0$ and $\sigma=1$. Thus, the equations for Lecun's distribution are as follows:
 
 \begin{equation}
     X \sim N \left[~-\frac{1}{\sqrt{n_{j}}},~\frac{1}{\sqrt{n_{j}}}~\right]\\
