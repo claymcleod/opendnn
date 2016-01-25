@@ -62,21 +62,24 @@ class NeuralNetwork(object):
         self.train_fn = theano.function([X, y], updates=updates)
         return
 
-    def train(self, X, y):
-        assert hasattr(self, 'train_fn'), (
-            "You must first compile the network!")
-        self.train_fn(X, y)
+    def train(self, X, y, iterations=1):
+        assert hasattr(self, 'train_fn'), ("You must first compile the network!")
+        for x in xrange(iterations):
+            self.train_fn(X, y)
 
     def train_until_convergence(self, X, y, max_iterations=None, step=100, threshold=1e-3,
-                               verbose=False):
+                               verbose=False, track_loss=False):
         i = 0
         last_loss = 0
+        losses = []
 
         while max_iterations is None or i < max_iterations:
             for x in range(step+1):
                 self.train(X, y)
 
             this_loss = self.get_loss(X, y)
+            if track_loss:
+                losses.append(this_loss)
 
             if verbose:
                 print("Iteration {} - Loss: {}".format(i, this_loss))
@@ -89,6 +92,8 @@ class NeuralNetwork(object):
 
         if verbose:
             print("Converged at iteration {}".format(i))
+
+        return i, losses
 
     def get_loss(self, X, y):
         return self.loss_fn(X, y)
