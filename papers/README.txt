@@ -8,10 +8,11 @@ PAPERS.txt
 # Activations #
 ###############
 
-[A1] Softsign introduction => "Quadratic Polynomials Learn Better Image Features" (http://www.iro.umontreal.ca/~lisa/publications2/index.php/attachments/single/205)
-[A2] Rectified Linear Unit (ReLU) introduction => "Rectified Linear Units Improve Restricted Boltzmann Machines" (http://www.cs.toronto.edu/~fritz/absps/reluICML.pdf)
-[A3] Leaky ReLU (LReLU) introduction => "Rectifier Nonlinearities Improve Neural Network Acoustic Models" (https://web.stanford.edu/~awni/papers/relu_hybrid_icml2013_final.pdf)
-[A4] Parametric ReLU (PReLU) introduction => "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification" (http://arxiv.org/abs/1502.01852)
+[A1] Sigmoid and Tanh layers discussed in-depth => "Efficient Backprop" (http://cseweb.ucsd.edu/classes/wi08/cse253/Handouts/lecun-98b.pdf)
+[A2] Softsign introduction => "Quadratic Polynomials Learn Better Image Features" (http://www.iro.umontreal.ca/~lisa/publications2/index.php/attachments/single/205)
+[A3] Rectified Linear Unit (ReLU) introduction => "Rectified Linear Units Improve Restricted Boltzmann Machines" (http://www.cs.toronto.edu/~fritz/absps/reluICML.pdf)
+[A4] Leaky ReLU (LReLU) introduction => "Rectifier Nonlinearities Improve Neural Network Acoustic Models" (https://web.stanford.edu/~awni/papers/relu_hybrid_icml2013_final.pdf)
+[A5] Parametric ReLU (PReLU) introduction => "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification" (http://arxiv.org/abs/1502.01852)
 
 ###################
 # Initializations #
