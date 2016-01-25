@@ -5,3 +5,6 @@ testing ground for my ideas involving DNNs.
 
 For papers that influenced this library, please visit the 'Papers'
 folder.
+
+For my notes I've deemed important through this process, please
+visit the "Notes" folder.
