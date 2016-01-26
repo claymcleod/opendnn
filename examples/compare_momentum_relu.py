@@ -1,14 +1,43 @@
 import theano
 import numpy as np
+import matplotlib.pyplot as plt
+
 from datetime import datetime
 from opendnn.utils import data
 from opendnn.layers import Dense, Activation
-from opendnn.modifiers import Momentum
+from opendnn.experiments import MReLU
 from opendnn.models import NeuralNetwork
 
+# Number of hidden layers in the network
+num_layers = 3
+
+# Number of nodes in the hidden layer
+num_hidden_nodes = 5
+
+# Learning rate for neural networks
+learning_rate = 0.1
+
+# Make the MReLU trainable
+trainable_mrelu = True
+
+# Value for the Proportional branch and the Derivative branch
+P_val = 0.5
+D_val = 0.5
+
+# Comment if you REALLY know what you are doing
+# WARNING: values over 1. can result in saturation and values
+#          under 1. could lead to extremely sparse values.
+assert (P_val + D_val == 1.), ("Ratios must add up to one to prevent saturation!")
+
 # Number of times to train the neural network
-num_training_iterations = 100
-threshold=1e-5
+num_training_iterations = 1000
+
+# For this example, MReLU seems to perform best in the tail end of the
+# training process. Since the weights vary so much in the beginning, it
+# can be hard to see exactly what is going on. Thus, start_plotting_index
+# was introduced. The first X losses will be skipped when plotting so
+# that the tail distribution is easier to examine.
+start_plotting_index = 100
 
 # Data is the Iris training set
 X = np.array([[5.1, 3.5, 1.4, 0.2], [4.9, 3.0, 1.4, 0.2], [4.7, 3.2, 1.3, 0.2],
@@ -70,34 +99,36 @@ y = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
               2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 y = data.one_hot_encode(y)
 
-momentum_iters_wins = 0
-random_offset = np.random.randint(0, 10000)
 
+nn = NeuralNetwork(4)
+for x in range(num_layers):
+    nn.add_layer(Dense(num_hidden_nodes))
+    nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
+nn.add_layer(Dense(3))
+nn.add_layer(Activation('softmax'))
+nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
+mrelu_loss = []
 for x in range(num_training_iterations):
-    np.random.seed(x + random_offset)
-    nn = NeuralNetwork(4)
-    nn.add_layer(Dense(5))
-    nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
-    nn.add_layer(Dense(5))
-    nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
-    nn.add_layer(Dense(3))
-    nn.add_layer(Activation('softmax'))
-    nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
-    (m_iters, m_loss) = nn.train_until_convergence(X, y, step=10, threshold=threshold)
+    nn.train(X, y)
+    mrelu_loss.append(nn.get_loss(X, y))
 
-    np.random.seed(x + random_offset)
-    nn = NeuralNetwork(4)
-    nn.add_layer(Dense(5))
+nn = NeuralNetwork(4)
+for x in range(num_layers):
+    nn.add_layer(Dense(num_hidden_nodes))
     nn.add_layer(Activation('relu'))
-    nn.add_layer(Dense(5))
-    nn.add_layer(Activation('relu'))
-    nn.add_layer(Dense(3))
-    nn.add_layer(Activation('softmax'))
-    nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
-    (r_iters, r_loss) = nn.train_until_convergence(X, y, step=10, threshold=threshold)
+nn.add_layer(Dense(3))
+nn.add_layer(Activation('softmax'))
+nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
+relu_loss = []
+for x in range(num_training_iterations):
+    nn.train(X, y)
+    relu_loss.append(nn.get_loss(X, y))
 
-    if m_iters < r_iters:
-        print("Momentum wins iters!")
-        momentum_iters_wins = momentum_iters_wins + 1
-    else:
-        print("Momentum loses iters.")
+# Plotting
+mrelu_, = plt.plot(mrelu_loss[start_plotting_index:], 'g.', label="mrelu")
+relu_, = plt.plot(relu_loss[start_plotting_index:], 'b^', label="relu")
+plt.title("MReLU vs. ReLU loss over time")
+plt.xlabel("Iterations")
+plt.ylabel("Loss fn (categorical crossentropy)")
+plt.legend(handles=[mrelu_, relu_])
+plt.show()
