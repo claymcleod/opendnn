@@ -28,9 +28,6 @@ class NeuralNetwork(object):
         self.dims = zip(self.dims, self.dims[1:])
 
     def _compile_theano_(self, loss_fn, pred_fn, init_fn, learning_rate, use_normal):
-        X = theano.tensor.matrix('X', theano.config.floatX)
-        y = theano.tensor.matrix('y', theano.config.floatX)
-        y_hat = None
 
         if type(loss_fn) == str:
             loss_fn = opendnn.loss.resolve(loss_fn)
@@ -41,12 +38,15 @@ class NeuralNetwork(object):
         if type(init_fn) == str:
             init_fn = opendnn.initialization.resolve(init_fn)
 
+
+        # Start training
+        X = theano.tensor.matrix('X', theano.config.floatX)
+        y = theano.tensor.matrix('y', theano.config.floatX)
+        y_hat = X
+
         for index, (layer, (input_dim, output_dim)) in enumerate(
                 zip(self.layers, self.dims)):
-            if y_hat is None:
-                y_hat = layer._build_layer_(X, index, input_dim, output_dim, init_fn, use_normal)
-            else:
-                y_hat = layer._build_layer_(y_hat, index, input_dim, output_dim, init_fn, use_normal)
+            y_hat = layer._build_layer_(y_hat, index, input_dim, output_dim, init_fn, use_normal)
 
         _loss_fn = loss_fn(y_hat, y)
         _pred_fn = pred_fn(y_hat)
@@ -69,11 +69,11 @@ class NeuralNetwork(object):
 
     def train_until_convergence(self, X, y, max_iterations=None, step=100, threshold=1e-3,
                                verbose=False, track_loss=False):
-        i = 0
+        iters = 0
         last_loss = 0
         losses = []
 
-        while max_iterations is None or i < max_iterations:
+        while max_iterations is None or iters < max_iterations:
             for x in range(step+1):
                 self.train(X, y)
 
@@ -82,18 +82,18 @@ class NeuralNetwork(object):
                 losses.append(this_loss)
 
             if verbose:
-                print("Iteration {} - Loss: {}".format(i, this_loss))
+                print("Iteration {} - Loss: {}".format(iters, this_loss))
 
             if (abs(last_loss - this_loss) <= threshold):
                 break
 
             last_loss = this_loss
-            i = i + step
+            iters = iters + step
 
         if verbose:
-            print("Converged at iteration {}".format(i))
+            print("Converged at iteration {}".format(iters))
 
-        return i, losses
+        return iters, losses
 
     def get_loss(self, X, y):
         return self.loss_fn(X, y)

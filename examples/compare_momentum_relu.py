@@ -6,11 +6,9 @@ from opendnn.layers import Dense, Activation
 from opendnn.modifiers import Momentum
 from opendnn.models import NeuralNetwork
 
-# Seeding for reproducability
-#np.random.seed(2)
-
 # Number of times to train the neural network
-num_training_iterations = 2000
+num_training_iterations = 100
+threshold=1e-5
 
 # Data is the Iris training set
 X = np.array([[5.1, 3.5, 1.4, 0.2], [4.9, 3.0, 1.4, 0.2], [4.7, 3.2, 1.3, 0.2],
@@ -72,41 +70,34 @@ y = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
               2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 y = data.one_hot_encode(y)
 
-m_loss = []
-r_loss = []
+momentum_iters_wins = 0
+random_offset = np.random.randint(0, 10000)
 
-print("Compiling Momentum ReLU neural network")
-nn = NeuralNetwork(4)
-nn.add_layer(Dense(5))
-nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
-nn.add_layer(Dense(5))
-nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
-nn.add_layer(Dense(3))
-nn.add_layer(Activation('softmax'))
-nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
-
-print("Starting training for Momentum ReLU")
 for x in range(num_training_iterations):
-    nn.train(X, y)
-    m_loss.append(nn.get_loss(X, y))
+    np.random.seed(x + random_offset)
+    nn = NeuralNetwork(4)
+    nn.add_layer(Dense(5))
+    nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
+    nn.add_layer(Dense(5))
+    nn.add_layer(Momentum(coefs=[0.0, 0.8, 0.2]))
+    nn.add_layer(Dense(3))
+    nn.add_layer(Activation('softmax'))
+    nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
+    (m_iters, m_loss) = nn.train_until_convergence(X, y, step=10, threshold=threshold)
 
-print("Compiling ReLU NeuralNetwork")
-nn = NeuralNetwork(4)
-nn.add_layer(Dense(5))
-nn.add_layer(Activation('relu'))
-nn.add_layer(Dense(5))
-nn.add_layer(Activation('relu'))
-nn.add_layer(Dense(3))
-nn.add_layer(Activation('softmax'))
-nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
+    np.random.seed(x + random_offset)
+    nn = NeuralNetwork(4)
+    nn.add_layer(Dense(5))
+    nn.add_layer(Activation('relu'))
+    nn.add_layer(Dense(5))
+    nn.add_layer(Activation('relu'))
+    nn.add_layer(Dense(3))
+    nn.add_layer(Activation('softmax'))
+    nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax')
+    (r_iters, r_loss) = nn.train_until_convergence(X, y, step=10, threshold=threshold)
 
-print("Starting training for ReLU")
-for x in range(num_training_iterations):
-    nn.train(X, y)
-    r_loss.append(nn.get_loss(X, y))
-
-# Plotting code
-import matplotlib.pyplot as plt
-t = np.arange(0, len(r_loss), 1)
-plt.plot(t, m_loss, 'bs', t, r_loss, 'g^')
-plt.show()
+    if m_iters < r_iters:
+        print("Momentum wins iters!")
+        momentum_iters_wins = momentum_iters_wins + 1
+    else:
+        print("Momentum loses iters.")
