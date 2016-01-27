@@ -1,6 +1,5 @@
 import theano
 import numpy as np
-#import matplotlib.pyplot as plt
 
 from datetime import datetime
 from opendnn.utils import data
@@ -12,10 +11,10 @@ from opendnn.models import NeuralNetwork
 num_layers = 3
 
 # Number of nodes in the hidden layer
-num_hidden_nodes = 3
+num_hidden_nodes = 5
 
 # Learning rate for neural networks
-learning_rate = 0.2
+learning_rate = 0.1
 
 # Make the MReLU trainable
 trainable_mrelu = False
@@ -99,11 +98,15 @@ y = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
               2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 y = data.one_hot_encode(y)
 
+x_plot = []
+y_plot = []
+z_plot = []
 
 nn = NeuralNetwork(4)
 for x in range(num_layers):
     nn.add_layer(Dense(num_hidden_nodes))
-    nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
+    nn.add_layer(Activation('relu'))
+    #nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
 nn.add_layer(Dense(3))
 nn.add_layer(Activation('softmax'))
 nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
@@ -112,24 +115,26 @@ for x in range(num_training_iterations):
     nn.train(X, y)
     mrelu_loss.append(nn.get_loss(X, y))
 
-nn = NeuralNetwork(4)
-for x in range(num_layers):
-    nn.add_layer(Dense(num_hidden_nodes))
-    nn.add_layer(Activation('relu'))
-nn.add_layer(Dense(3))
-nn.add_layer(Activation('softmax'))
-nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
-relu_loss = []
-for x in range(num_training_iterations):
-    nn.train(X, y)
-    relu_loss.append(nn.get_loss(X, y))
+weights = nn.layers[2].W.get_value()
 
-# Plotting
+for I in np.arange(0, 1, 0.05):
+    for J in np.arange(0, 1, 0.05):
+        weights[0][0] = I
+        weights[0][1] = J
+        nn.layers[2].W.set_value(weights)
+        loss = nn.get_loss(X, y)
+        x_plot.append(I)
+        y_plot.append(J)
+        z_plot.append(loss)
 
-mrelu_, = plt.plot(mrelu_loss[start_plotting_index:], 'g.', label="mrelu")
-relu_, = plt.plot(relu_loss[start_plotting_index:], 'b^', label="relu")
-plt.title("MReLU vs. ReLU loss over time")
-plt.xlabel("Iterations")
-plt.ylabel("Loss fn (categorical crossentropy)")
-plt.legend(handles=[mrelu_, relu_])
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(x_plot, y_plot, z_plot, cmap=cm.jet, linewidth=0.2)
+plt.title("Weights vs. Cost function")
+plt.xlabel("W_1 value")
+plt.ylabel("W_2 value")
 plt.show()
