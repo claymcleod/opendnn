@@ -20,8 +20,8 @@ learning_rate = 0.1
 trainable_mrelu = False
 
 # Value for the Proportional branch and the Derivative branch
-P_val = 0.5
-D_val = 0.5
+P_val = 0.75
+D_val = 0.25
 
 # Comment if you REALLY know what you are doing
 # WARNING: values over 1. can result in saturation and values
@@ -98,22 +98,21 @@ y = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
               2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2])
 y = data.one_hot_encode(y)
 
-x_plot = []
-y_plot = []
-z_plot = []
+x_plot_before = []
+y_plot_before = []
+z_plot_before = []
+x_plot_after = []
+y_plot_after = []
+z_plot_after = []
 
 nn = NeuralNetwork(4)
 for x in range(num_layers):
     nn.add_layer(Dense(num_hidden_nodes))
-    nn.add_layer(Activation('relu'))
-    #nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
+    #nn.add_layer(Activation('relu'))
+    nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
 nn.add_layer(Dense(3))
 nn.add_layer(Activation('softmax'))
 nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
-mrelu_loss = []
-for x in range(num_training_iterations):
-    nn.train(X, y)
-    mrelu_loss.append(nn.get_loss(X, y))
 
 weights = nn.layers[2].W.get_value()
 
@@ -123,18 +122,41 @@ for I in np.arange(0, 1, 0.05):
         weights[0][1] = J
         nn.layers[2].W.set_value(weights)
         loss = nn.get_loss(X, y)
-        x_plot.append(I)
-        y_plot.append(J)
-        z_plot.append(loss)
+        x_plot_before.append(I)
+        y_plot_before.append(J)
+        z_plot_before.append(loss)
+
+for x in range(num_training_iterations):
+    nn.train(X, y)
+
+weights = nn.layers[2].W.get_value()
+
+for I in np.arange(0, 1, 0.05):
+    for J in np.arange(0, 1, 0.05):
+        weights[0][0] = I
+        weights[0][1] = J
+        nn.layers[2].W.set_value(weights)
+        loss = nn.get_loss(X, y)
+        x_plot_after.append(I)
+        y_plot_after.append(J)
+        z_plot_after.append(loss)
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 
-fig = plt.figure()
-ax = fig.gca(projection='3d')
-ax.plot_trisurf(x_plot, y_plot, z_plot, cmap=cm.jet, linewidth=0.2)
-plt.title("Weights vs. Cost function")
-plt.xlabel("W_1 value")
-plt.ylabel("W_2 value")
+fig = plt.figure(figsize=plt.figaspect(0.5))
+fig.suptitle("Loss function as a function of weights")
+ax = fig.add_subplot(1, 2, 1, projection='3d')
+ax.plot_trisurf(x_plot_before, y_plot_before, z_plot_before, cmap=cm.jet, linewidth=0.2)
+plt.title("Before")
+ax.set_xlabel("W_1 value")
+ax.set_ylabel("W_2 value")
+ax.set_zlabel("Loss (categorical crossentropy)")
+ax = fig.add_subplot(1, 2, 2, projection='3d')
+ax.plot_trisurf(x_plot_after, y_plot_after, z_plot_after, cmap=cm.jet, linewidth=0.2)
+plt.title("After")
+ax.set_xlabel("W_1 value")
+ax.set_ylabel("W_2 value")
+ax.set_zlabel("Loss (categorical crossentropy)")
 plt.show()
