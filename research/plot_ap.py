@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 from opendnn.utils import data
 from opendnn.layers import Dense, Activation
-from opendnn.experiments import MReLU
+from opendnn.experiments import ActivationPool
 from opendnn.models import NeuralNetwork
 
 # Number of hidden layers in the network
@@ -17,7 +17,7 @@ num_hidden_nodes = 5
 learning_rate = 0.1
 
 # Make the MReLU trainable
-trainable_mrelu = False
+trainable_mrelu = True
 
 # Value for the Proportional branch and the Derivative branch
 P_val = 0.75
@@ -30,13 +30,6 @@ assert (P_val + D_val == 1.), ("Ratios must add up to one to prevent saturation!
 
 # Number of times to train the neural network
 num_training_iterations = 1000
-
-# For this example, MReLU seems to perform best in the tail end of the
-# training process. Since the weights vary so much in the beginning, it
-# can be hard to see exactly what is going on. Thus, start_plotting_index
-# was introduced. The first X losses will be skipped when plotting so
-# that the tail distribution is easier to examine.
-start_plotting_index = 100
 
 # Data is the Iris training set
 X = np.array([[5.1, 3.5, 1.4, 0.2], [4.9, 3.0, 1.4, 0.2], [4.7, 3.2, 1.3, 0.2],
@@ -109,13 +102,13 @@ nn = NeuralNetwork(4)
 for x in range(num_layers):
     nn.add_layer(Dense(num_hidden_nodes))
     #nn.add_layer(Activation('relu'))
-    nn.add_layer(MReLU(coefs=[P_val, D_val], trainable=trainable_mrelu))
+    nn.add_layer(ActivationPool([theano.tensor.nnet.relu, theano.tensor.nnet.softplus, theano.tensor.nnet.sigmoid]))
 nn.add_layer(Dense(3))
 nn.add_layer(Activation('softmax'))
 nn.compile(loss_fn='categorical_crossentropy', pred_fn='argmax', learning_rate=learning_rate)
 
 weights = nn.layers[2].W.get_value()
-
+print("Final loss: {}".format(nn.get_loss(X, y)))
 for I in np.arange(0, 1, 0.05):
     for J in np.arange(0, 1, 0.05):
         weights[0][0] = I

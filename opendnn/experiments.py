@@ -49,7 +49,7 @@ class ActivationPool(Layer):
         self.activation_weights = []
         for x, activation_fn in enumerate(self.activation_fns):
             this_weight = theano.shared(self.weights_init[x], name='AP_w{}'.format(x))
-            X = this_weight * activation_fn(X)
+            X = theano.tensor.clip(this_weight, -self.weights_init[x], self.weights_init[x]) * activation_fn(X)
             self.activation_weights.append(this_weight)
         return X
 
