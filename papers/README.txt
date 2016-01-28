@@ -14,6 +14,12 @@ PAPERS.txt
 [A4] Leaky ReLU (LReLU) introduction => "Rectifier Nonlinearities Improve Neural Network Acoustic Models" (https://web.stanford.edu/~awni/papers/relu_hybrid_icml2013_final.pdf)
 [A5] Parametric ReLU (PReLU) introduction => "Delving Deep into Rectifiers: Surpassing Human-Level Performance on ImageNet Classification" (http://arxiv.org/abs/1502.01852)
 
+############
+# ConvNets #
+############
+
+[C1] Conolutional filter bank introduction => "Learning Convolutional Feature Hierarchies for Visual Recognition" (http://yann.lecun.com/exdb/publis/pdf/koray-nips-10.pdf)
+
 ###################
 # Initializations #
 ###################
