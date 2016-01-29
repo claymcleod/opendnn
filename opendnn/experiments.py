@@ -1,6 +1,7 @@
-import numpy
+"""Module for experimental layers and other oddities"""
+
 import theano
-from opendnn.layers import Activation, Layer
+from opendnn.layers import Layer
 
 class MReLU(Layer):
     """Essentially a PD controller intuition using the ReLU function"""
