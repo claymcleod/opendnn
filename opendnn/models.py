@@ -1,3 +1,4 @@
+import math
 import theano
 import theano.tensor
 import theano.d3viz as V
@@ -62,10 +63,18 @@ class NeuralNetwork(object):
         self.train_fn = theano.function([X, y], updates=updates)
         return
 
-    def train(self, X, y, iterations=1):
+    def train(self, X, y, batch_size=None):
         assert hasattr(self, 'train_fn'), ("You must first compile the network!")
-        for x in xrange(iterations):
+
+        if not batch_size:
             self.train_fn(X, y)
+        else:
+            batch_iters = int(math.ceil(X.shape[0] / batch_size))
+            print("Batching")
+            for bi in range(batch_iters):
+                start = bi*batch_size
+                finish = ((bi+1)*batch_size)
+                self.train(X[start:finish], y[start:finish])
 
     def train_until_convergence(self, X, y, max_iterations=None, step=100, threshold=1e-3,
                                verbose=False, track_loss=False):
@@ -97,3 +106,7 @@ class NeuralNetwork(object):
 
     def get_loss(self, X, y):
         return self.loss_fn(X, y)
+
+    def print_model(self):
+        for layer in self.layers:
+            print('- {}'.format(layer))

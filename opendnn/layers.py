@@ -23,6 +23,9 @@ class Dense(Layer):
         super(Dense, self).__init__(*args, **kwargs)
 
     def _build_layer_(self, X, layer_num, input_dim, output_dim, init_fn, use_normal):
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.init_fn = init_fn
         self.W = theano.shared(init_fn(input_dim, output_dim, use_normal),
                                name='Layer{}_W'.format(layer_num))
         self.B = theano.shared(numpy.zeros(output_dim),
@@ -47,6 +50,9 @@ class Dense(Layer):
                 learning_rate))
         return updates
 
+    def __repr__(self):
+        return 'Dense {} x {} ({})'.format(self.input_dim, self.output_dim, self.init_fn)
+
 
 class Activation(Layer):
 
@@ -66,7 +72,12 @@ class Activation(Layer):
         super(Activation, self).__init__(*args, **kwargs)
 
     def _build_layer_(self, X, layer_num, input_dim, output_dim, init_fn, use_normal):
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         return self.nonlinearity(X)
 
     def _get_updates_(self, loss, learning_rate):
         return []
+
+    def __repr__(self):
+        return 'Activation {} x {}'.format(self.input_dim, self.output_dim)
