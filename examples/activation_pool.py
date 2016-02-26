@@ -21,12 +21,13 @@ def get_layer_for_setting(nn, setting):
         print("Invalid setting: {}".format(setting))
         sys.exit(1)
 
-if len(sys.argv) <= 2:
+if len(sys.argv) <= 3:
     print("Must include command line arguments!")
     sys.exit(1)
 
 setting = sys.argv[1].lower()
 filepath = sys.argv[2]
+learning_rate = int(sys.argv[3])
 
 print('Setting: {}'.format(setting))
 print('Filepath: {}'.format(filepath))
@@ -36,13 +37,14 @@ f = open(filepath, 'wa')
 
 num_layers = 5
 num_hidden_nodes = 784
-learning_rate = 0.1
 num_training_iterations = 1000
 
 # Get the cifar10 dataset
+print("Getting data...")
 (X_train, y_train), (X_test, y_test) = data.get_mnist()
 
 # Compile network
+print("Compiling model...", end='')
 nn = NeuralNetwork(X_train.shape[1])
 for x in range(num_layers):
     nn.add_layer(Dense(num_hidden_nodes))
@@ -51,6 +53,7 @@ nn.add_layer(Dense(10))
 nn.add_layer(Activation('softmax'))
 nn.compile(loss_fn='categorical_crossentropy', init_fn='he', pred_fn='argmax',
            learning_rate=learning_rate, use_normal=True)
+print('finished!')
 
 ap_loss = []
 for i in range(1, num_training_iterations+1):
