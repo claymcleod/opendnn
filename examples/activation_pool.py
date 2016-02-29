@@ -14,9 +14,9 @@ def get_layer_for_setting(nn, setting):
     elif setting == 'pap':
         nn.add_layer(MReLU(trainable=True))
     elif setting == 'aphalf':
-        nn.add_layer(MReLU(trainable=False, weights_init=[0.5, 0.5]))
+        nn.add_layer(MReLU(trainable=False, coefs=[0.5, 0.5]))
     elif setting == 'apstaggered':
-        nn.add_layer(MReLU(trainable=False, weights_init=[0.8, 0.2]))
+        nn.add_layer(MReLU(trainable=False, coefs=[0.8, 0.2]))
     else:
         print("Invalid setting: {}".format(setting))
         sys.exit(1)
