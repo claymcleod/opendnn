@@ -66,6 +66,10 @@ class Activation(Layer):
             self.nonlinearity = theano.tensor.nnet.relu
         elif activation == 'softmax':
             self.nonlinearity = theano.tensor.nnet.softmax
+        elif activation == 'step':
+            def step(X):
+                return theano.tensor.switch(theano.tensor.le(X, 0), 0, 1)
+            self.nonlinearity = step
         else:
             raise RuntimeError(
                 "Unsupported activation type: {}".format(activation))

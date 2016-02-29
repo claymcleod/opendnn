@@ -27,9 +27,10 @@ if len(sys.argv) <= 3:
 
 setting = sys.argv[1].lower()
 filepath = sys.argv[2]
-learning_rate = int(sys.argv[3])
+learning_rate = float(sys.argv[3])
 
 print('Setting: {}'.format(setting))
+print('Learning Rate: {}'.format(learning_rate))
 print('Filepath: {}'.format(filepath))
 print()
 
@@ -51,7 +52,7 @@ for x in range(num_layers):
     get_layer_for_setting(nn, setting)
 nn.add_layer(Dense(10))
 nn.add_layer(Activation('softmax'))
-nn.compile(loss_fn='categorical_crossentropy', init_fn='he', pred_fn='argmax',
+nn.compile(loss_fn='categorical_crossentropy', init_fn='lecun', pred_fn='argmax',
            learning_rate=learning_rate, use_normal=True)
 print('finished!')
 
@@ -60,7 +61,7 @@ for i in range(1, num_training_iterations+1):
     start = time()
     nn.train(X_train, y_train)
     time_elapsed = time() - start
-    s = "{},{},{}".format(i, nn.get_loss(X_train, y_train), time_elapsed)
+    s = "{},{},{}".format(i, nn.get_accuracy(X_train, y_train), time_elapsed)
     print(s)
     f.write(s+'\n')
     #ap_loss.append()

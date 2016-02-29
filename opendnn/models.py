@@ -51,6 +51,7 @@ class NeuralNetwork(object):
 
         _loss_fn = loss_fn(y_hat, y)
         _pred_fn = pred_fn(y_hat)
+        _accuracy_fn = theano.tensor.eq(pred_fn(y_hat),y).mean()
 
         updates = []
         for layer in self.layers:
@@ -58,23 +59,23 @@ class NeuralNetwork(object):
             updates.extend(_updates)
 
         self.raw_output_fn = theano.function([X], y_hat)
-        self.predict_fn = theano.function([X], _pred_fn)
+        self.prediction_fn = theano.function([X], _pred_fn)
         self.loss_fn = theano.function([X, y], _loss_fn)
+        self.accuracy_fn = theano.function([X, y], _accuracy_fn)
         self.train_fn = theano.function([X, y], updates=updates)
         return
 
-    def train(self, X, y, batch_size=None):
+    def train(self, X, y, batch_size=32):
         assert hasattr(self, 'train_fn'), ("You must first compile the network!")
 
         if not batch_size:
             self.train_fn(X, y)
         else:
             batch_iters = int(math.ceil(X.shape[0] / batch_size))
-            print("Batching")
             for bi in range(batch_iters):
                 start = bi*batch_size
                 finish = ((bi+1)*batch_size)
-                self.train(X[start:finish], y[start:finish])
+                self.train_fn(X[start:finish], y[start:finish])
 
     def train_until_convergence(self, X, y, max_iterations=None, step=100, threshold=1e-3,
                                verbose=False, track_loss=False):
@@ -106,6 +107,9 @@ class NeuralNetwork(object):
 
     def get_loss(self, X, y):
         return self.loss_fn(X, y)
+
+    def get_accuracy(self, X, y):
+        return self.accuracy_fn(X, y)
 
     def print_model(self):
         for layer in self.layers:
